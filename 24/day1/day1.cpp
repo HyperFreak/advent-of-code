@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <map>
 
 /**
  * reads two integers per line of a file and puts them into two lists a and b
@@ -41,12 +42,25 @@ int main(int argc, char** argv) {
     std::sort(listA.begin(), listA.end());
     std::sort(listB.begin(), listB.end());
 
-    int finalResult = 0;                                                            // get final result by adding delta(a, b) to finalRes for each line
+    int part1Res = 0;                                                               // get final result by adding delta(a, b) to finalRes for each line
     for (int i = 0; i < listA.size(); i++) {
         int dif = listA[i] > listB[i] ? listA[i] - listB[i] : listB[i] - listA[i];
-        finalResult += dif;
+        part1Res += dif;
     }
-    std::cout << "Final Result: " << finalResult << "\n";
+    std::cout << "Part 1 Final Result: " << part1Res << "\n";
+
+
+    // PART 2
+    std::map<int, int> counter;                                                     // Use map as a counter to count occurances of each number in listB
+    for (int i = 0; i < listB.size(); i++) {                                        
+        counter[listB[i]]++;
+    }
+
+    int part2Res = 0;
+    for (int i = 0; i < listA.size(); i++) {                                        // Go through each number and add how often it appears in listB * the value
+        part2Res += counter[listA[i]] * listA[i];
+    }
+    std::cout << "Part 2 Final Result: " << part2Res << "\n";
 
     return 0;
 }
