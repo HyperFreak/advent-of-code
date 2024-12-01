@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 /**
  * reads two integers per line of a file and puts them into two lists a and b
@@ -10,45 +11,16 @@ void readInput(std::string file, std::vector<int> &a, std::vector<int> &b) {
     std::ifstream inStream(file);
     std::string inA, inB;
 
+    if (!inStream) {
+        std::cout << "Error couldn\'t open file.\n";
+        return;
+    }
+
     while (inStream >> inA >> inB) {                                                // go through each line until EOF
         a.push_back(std::stoi(inA));                                                // stoi = parseInt
         b.push_back(std::stoi(inB));
     }
     inStream.close();                                                               // close input stream
-}
-
-/**
- * stable sorts a vector of integers in n log(n)
- */
-void mergeSort(std::vector<int> &vec) {
-    if (vec.size() > 1) {
-        int mid = vec.size() / 2;
-        std::vector<int> left(vec.begin(), vec.begin() + mid);
-        std::vector<int> right(vec.begin() + mid, vec.end());
-
-        mergeSort(left);
-        mergeSort(right);
-
-        int i = 0, j = 0, k = 0;
-        while (i < left.size() && j < right.size()) {
-            if (left[i] < right[j]) {
-                vec[k] = left[i];
-                i++;
-            } else {
-                vec[k] = right[j];
-                j++;
-            }
-            k++;
-        }
-
-        while (i < left.size()) {
-            vec[k++] = left[i++];
-        }
-
-        while (j < right.size()) {
-            vec[k++] = right[j++];
-        }
-    }
 }
 
 int main(int argc, char** argv) {
@@ -66,8 +38,8 @@ int main(int argc, char** argv) {
     listB.reserve(size);
 
     readInput(FULL ? "full-input.txt" : "test-input.txt", listA, listB);            // input and sort lists
-    mergeSort(listA);
-    mergeSort(listB);
+    std::sort(listA.begin(), listA.end());
+    std::sort(listB.begin(), listB.end());
 
     int finalResult = 0;                                                            // get final result by adding delta(a, b) to finalRes for each line
     for (int i = 0; i < listA.size(); i++) {
