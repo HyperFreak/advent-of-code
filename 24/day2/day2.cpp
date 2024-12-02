@@ -5,38 +5,47 @@
 #include <sstream>
 #include <algorithm>
 
+/**
+ * checks if a int vector is mostly ascending
+ */
 bool isAscending (std::vector<int> numbers) {
     int dir = 0;
-    for (size_t i = 0, j = 1; j < numbers.size(); i++, j++) {
-        if (numbers[i] < numbers[j]) {
-            dir++;
-        } else {
-            dir--;
-        }
+    for (size_t i = 1; i < numbers.size(); i++) {
+        dir += numbers[i-1] < numbers[i] ? 1 : -1;
     }
     return dir > 0;
 }
 
+/**
+ * returns the absolute difference between two numbers
+ */
 unsigned int delta(int x, int y) {
     return x > y ? x - y : y - x;
 }
 
+/**
+ * Checks if a list of number is ordered and doesn't have gaps lower than 1 or higher than 3
+ */
 bool checkLineSafe(std::vector<int> numbers) {
     bool ascending = numbers[0] < numbers[1];
-
     for (size_t i = 1; i < numbers.size(); i++) {
         unsigned int d = delta(numbers[i-1], numbers[i]);
         if (d < 1 || d > 3) {
             return false;
-        } else if (numbers[i-1] > numbers[i] && ascending) {
+        }
+        if (numbers[i-1] > numbers[i] && ascending) {
             return false;
-        } else if (numbers[i-1] < numbers[i] && !ascending) {
+        }
+        if (numbers[i-1] < numbers[i] && !ascending) {
             return false;
         }
     }
     return true;
 }
 
+/**
+ * Generates a list of integers from a string
+ */
 std::vector<int> getNumbers(std::string line) {
     std::vector<int> numbers;
     std::istringstream isStram(line);
@@ -47,48 +56,41 @@ std::vector<int> getNumbers(std::string line) {
     return numbers;
 }
 
+/**
+ * removes one error space if it exists and checks if the report is safe
+ */
 bool checkLineSafeWithDampener(std::vector<int> numbers) {
     bool ascending = isAscending(numbers);
-
+    int remove = -1;
     for (size_t i = 1; i < numbers.size(); i++) {
-        if (ascending) {
-            if (numbers[i-1] > numbers[i]) {
-                std::vector<int> v1(numbers);
-                std::vector<int> v2(numbers);
-                v1.erase(v1.begin() + i-1);
-                v2.erase(v2.begin() + i);
-                return checkLineSafe(v1) || checkLineSafe(v2);
-            }
-        } else {
-            if (numbers[i-1] < numbers[i]) {
-                std::vector<int> v1(numbers);
-                std::vector<int> v2(numbers);
-                v1.erase(v1.begin() + i-1);
-                v2.erase(v2.begin() + i);
-                return checkLineSafe(v1) || checkLineSafe(v2);
-            }
+        if (ascending && (numbers[i-1] > numbers[i])) {
+            remove = i;
+            break;
         }
-
+        if (!ascending && (numbers[i-1] < numbers[i])) {
+            remove = i;
+            break;
+        }
         if (delta(numbers[i-1], numbers[i]) < 1 || delta(numbers[i-1], numbers[i]) > 3) {
-            std::vector<int> v1(numbers);
-            std::vector<int> v2(numbers);
-            v1.erase(v1.begin() + i-1);
-            v2.erase(v2.begin() + i);
-            return checkLineSafe(v1) || checkLineSafe(v2);
+            remove = i;
+            break;
         }
     }
-    return true;
+    if (remove >= 0) {
+        std::vector<int> v1(numbers), v2(numbers);
+        v1.erase(v1.begin() + remove-1);
+        v2.erase(v2.begin() + remove);
+        return checkLineSafe(v1) || checkLineSafe(v2);
+    }
+    return checkLineSafe(numbers);
 }
 
-
 int main(int argc, char** argv) {
-    bool test = false;
+    bool FULL = true;
     if (argc > 1) {
         std::string runAs(argv[1]);
-        test = (argv[1] == runAs);
+        FULL = !(argv[1] == runAs);
     }
-    const bool FULL = !test;
-
     std::ifstream file(FULL ? "full-input.txt" : "test-input.txt");
     if (!file.is_open()) {
         std::cerr << "Error: Couldn\'t open File!\n";
