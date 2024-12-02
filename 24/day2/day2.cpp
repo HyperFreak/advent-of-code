@@ -3,7 +3,6 @@
 #include <fstream>
 #include <vector>
 #include <sstream>
-#include <algorithm>
 
 /**
  * checks if a int vector is mostly ascending
@@ -60,6 +59,9 @@ std::vector<int> getNumbers(std::string line) {
  * removes one error space if it exists and checks if the report is safe
  */
 bool checkLineSafeWithDampener(std::vector<int> numbers) {
+    if (checkLineSafe(numbers)) {
+        return true;
+    }
     bool ascending = isAscending(numbers);
     int remove = -1;
     for (size_t i = 1; i < numbers.size(); i++) {
@@ -82,14 +84,14 @@ bool checkLineSafeWithDampener(std::vector<int> numbers) {
         v2.erase(v2.begin() + remove);
         return checkLineSafe(v1) || checkLineSafe(v2);
     }
-    return checkLineSafe(numbers);
+    return false;
 }
 
 int main(int argc, char** argv) {
     bool FULL = true;
     if (argc > 1) {
         std::string runAs(argv[1]);
-        FULL = !(argv[1] == runAs);
+        FULL = !(runAs == "test");
     }
     std::ifstream file(FULL ? "full-input.txt" : "test-input.txt");
     if (!file.is_open()) {
