@@ -48,6 +48,32 @@ int countWord(std::string searchTerm, std::vector<std::string> &grid) {
     return res;
 }
 
+bool isX_MAS(std::vector<std::string> grid, size_t y, size_t x) {
+    if (y - 1 >= grid.size() || y + 1 >= grid.size()) {
+        return false;
+    }
+    if (x - 1 >= grid[y].size() || x + 1 >= grid[y].size()) {
+        return false;
+    }
+
+    bool a = (grid[y-1][x-1] == 'M' && grid[y+1][x+1] == 'S') || (grid[y-1][x-1] == 'S' && grid[y+1][x+1] == 'M');
+    bool b = (grid[y-1][x+1] == 'M' && grid[y+1][x-1] == 'S') || (grid[y-1][x+1] == 'S' && grid[y+1][x-1] == 'M');
+    return a && b;
+}
+
+int countX_MAS(std::vector<std::string> &grid) {
+    int res = 0;
+    
+    for (size_t i = 0; i < grid.size(); i++) {
+        for (size_t j = 0; j < grid[i].size(); j++) {
+            if (grid[i][j] == 'A') {
+                res += isX_MAS(grid, i, j);
+            }
+        }
+    }
+    return res;
+}
+
 int main(int argc, char** argv) {
     bool TEST = false;
     if (argc > 1) {
@@ -68,6 +94,7 @@ int main(int argc, char** argv) {
     file.close();
 
     std::cout << "Result Part 1: " << countWord("XMAS", grid) << ".\n";
+    std::cout << "Result Part 2: " << countX_MAS(grid) << ".\n";
 
     return 0;
 }
